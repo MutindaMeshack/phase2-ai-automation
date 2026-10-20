@@ -8,10 +8,18 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 
 ## Setup
 ```bash
-pip install requests
+pip install requests python-dotenv
+```
+
+Create a `.env` file in the project root (see `.env.example`):
+```
+OPENWEATHER_API_KEY=your_key_here
+EXCHANGE_API_KEY=your_key_here
 ```
 
 ## Run
 ```bash
 python week1/day1_weather.py
+python week1/day2_weather.py
+python week1/day2_currency.py
 ```
