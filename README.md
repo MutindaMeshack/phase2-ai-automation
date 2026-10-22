@@ -19,6 +19,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 1, Day 2:** API keys, `.env` files, error handling (OpenWeatherMap, ExchangeRate-API)
 - **Week 1, Day 3:** Command-line tool chaining two APIs, saving responses to JSON
 - **Week 1, Day 4:** Fetch API in JavaScript, async/await, loading and error states in the browser
+- **Week 1, Day 5:** Project: [Kenyan Business Currency Tracker](week1/kes-currency-tracker), a CLI tool that converts KES to USD, EUR and GBP with live rates
 
 ## Setup
 ```bash
