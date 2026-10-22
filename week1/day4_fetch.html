@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>City Weather</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; color: #222; }
+    h1 { color: #1F4E79; }
+    input { padding: 8px; font-size: 16px; width: 250px; max-width: 100%; }
+    button { background: #2E75B6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #1F4E79; }
+    button:disabled { background: #9db7d1; cursor: not-allowed; }
+    #result { background: #f7f9fc; border: 1px solid #d0dff0; border-radius: 8px; padding: 20px; margin-top: 20px; }
+    #result.error { background: #fdecea; border-color: #f5b5ae; color: #8a1c12; }
+    #result.loading { color: #666; font-style: italic; }
+    .row { margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<h1>City Weather</h1>
+<input type="text" id="cityInput" placeholder="Enter a city, e.g. Nairobi">
+<button id="searchBtn">Search</button>
+<div id="result">Enter a city above and click Search.</div>
+
+<script>
+const WEATHER_CODES = {
+  0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+  45: "Fog", 48: "Fog", 51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+  61: "Light rain", 63: "Rain", 65: "Heavy rain", 80: "Rain showers",
+  81: "Rain showers", 82: "Violent showers", 95: "Thunderstorm"
+};
+
+const resultBox = document.getElementById("result");
+const searchBtn = document.getElementById("searchBtn");
+const cityInput = document.getElementById("cityInput");
+
+function showMessage(text, type) {
+  resultBox.className = type || "";
+  resultBox.textContent = text;
+}
+
+function addRow(label, value) {
+  const row = document.createElement("div");
+  row.className = "row";
+  const strong = document.createElement("strong");
+  strong.textContent = label + ": ";
+  row.appendChild(strong);
+  row.appendChild(document.createTextNode(value));
+  resultBox.appendChild(row);
+}
+
+async function loadWeather() {
+  const city = cityInput.value.trim();
+
+  if (!city) {
+    showMessage("Please enter a city name.", "error");
+    return;
+  }
+
+  showMessage("Loading...", "loading");
+  searchBtn.disabled = true;
+
+  try {
+    // Call 1: city name -> coordinates
+    const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`;
+    const geoResponse = await fetch(geoUrl);
+    if (!geoResponse.ok) {
+      throw new Error(`Location service error (${geoResponse.status})`);
+    }
+    const geoData = await geoResponse.json();
+
+    if (!geoData.results || geoData.results.length === 0) {
+      throw new Error(`City "${city}" not found. Check the spelling.`);
+    }
+    const place = geoData.results[0];
+
+    // Call 2: coordinates -> current weather
+    const weatherUrl = "https://api.open-meteo.com/v1/forecast"
+      + `?latitude=${place.latitude}&longitude=${place.longitude}`
+      + "&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code";
+    const weatherResponse = await fetch(weatherUrl);
+    if (!weatherResponse.ok) {
+      throw new Error(`Weather service error (${weatherResponse.status})`);
+    }
+    const weatherData = await weatherResponse.json();
+    const current = weatherData.current;
+    const units = weatherData.current_units;
+
+    // Success: build the output
+    resultBox.className = "";
+    resultBox.textContent = "";
+
+    const heading = document.createElement("h2");
+    heading.textContent = `${place.name}, ${place.country || ""}`;
+    resultBox.appendChild(heading);
+
+    addRow("Condition", WEATHER_CODES[current.weather_code] || "Unknown");
+    addRow("Temperature", `${current.temperature_2m} ${units.temperature_2m}`);
+    addRow("Humidity", `${current.relative_humidity_2m}${units.relative_humidity_2m}`);
+    addRow("Wind", `${current.wind_speed_10m} ${units.wind_speed_10m}`);
+  } catch (error) {
+    showMessage(`Error: ${error.message}`, "error");
+  } finally {
+    searchBtn.disabled = false;
+  }
+}
+
+searchBtn.addEventListener("click", loadWeather);
+cityInput.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") loadWeather();
+});
+</script>
+
+</body>
+</html>
