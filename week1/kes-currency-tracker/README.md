@@ -30,7 +30,20 @@ python week1/kes-currency-tracker/currency_tracker.py
 
 ## Example output
 ```
-PASTE YOUR REAL TERMINAL OUTPUT HERE
+Kenyan Business Currency Tracker
+--------------------------------
+Price in KES (e.g. 15000): 140000
+
+=== Quote for KES 140,000.00 ===
+USD        1,078.00   (1 USD = 129.87 KES)
+EUR          959.70   (1 EUR = 145.88 KES)
+GBP          804.86   (1 GBP = 173.94 KES)
+
+Rates last updated: Thu, 22 Oct 2026 00:00:01 +0000
+Rates are indicative. Confirm with your bank before invoicing.
+
+Quote another price? (y/n): n
+Goodbye!
 ```
 
 ## Error handling
