@@ -20,10 +20,14 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 1, Day 3:** Command-line tool chaining two APIs, saving responses to JSON
 - **Week 1, Day 4:** Fetch API in JavaScript, async/await, loading and error states in the browser
 - **Week 1, Day 5:** Project: [Kenyan Business Currency Tracker](week1/kes-currency-tracker), a CLI tool that converts KES to USD, EUR and GBP with live rates
+- **Week 2, Days 6 to 9:** Client skills: reading briefs, writing proposals, delivering work, scope and payment terms (writing exercises)
+- **Week 2, Day 10:** Full client cycle on a simulated brief: [Dairy Co-op Payment Calculator](week2/dairy-calculator) and [client messages](week2/day10_client_cycle.md)
+- **Week 3, Day 11:** First AI API call with the Anthropic SDK; [SACCO Member Assistant](week3/sacco-assistant)
 
 ## Setup
 ```bash
 pip install requests python-dotenv
+pip install requests python-dotenv anthropic
 ```
 
 Create a `.env` file in the project root (see `.env.example`):
@@ -42,4 +46,7 @@ python week1/day2_currency.py
 python week1/day3_travel_info.py
 python week1/day3_load_saved.py
 start week1/day4_fetch.html
+python week1/kes-currency-tracker/currency_tracker.py
+python week2/dairy-calculator/dairy_calculator.py
+python week3/sacco-assistant/sacco_assistant.py
 ```
