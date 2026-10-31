@@ -54,7 +54,7 @@ def ask(question):
     try:
         message = client.messages.create(
             model=MODEL,
-            max_tokens=300,
+            max_tokens=1500,
             system=SYSTEM_PROMPT,
             messages=history[-9:],
         )
@@ -69,9 +69,11 @@ def ask(question):
     except anthropic.APIStatusError as e:
         print(f"The API returned an error (status {e.status_code}). Check your billing.")
     else:
-        answer = message.content[0].text
-        history.append({"role": "assistant", "content": answer})
-        return answer, message.usage
+        answer = "".join(block.text for block in message.content if block.type == "text").strip()
+        if answer:
+            history.append({"role": "assistant", "content": answer})
+            return answer, message.usage
+        print("The assistant returned no text. Try again.")
 
     history.pop()  # drop the unanswered question
     return None, None

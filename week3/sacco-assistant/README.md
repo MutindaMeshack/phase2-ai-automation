@@ -25,7 +25,23 @@ Type a question. Type `quit` to exit.
 
 ## Example
 ```
+Thika Matatu SACCO: Member Assistant (demo)
+Type your question, or "quit" to exit.
 
+Member: What is my balance?
+
+Assistant: I'd be happy to help you check your balance. Could you please share your member number first? Once I have it, I can give you your balance as at 31 October 2026.
+[379 tokens in, 49 out]
+
+Member: Member 001, how much do I have?
+
+Assistant: Thank you! Your balance as at 31 October 2026 is **KES 48,500**, Wanjiru.
+
+If you have any other questions, feel free to ask.
+[441 tokens in, 54 out]
+
+Member: quit
+Goodbye!
 ```
 
 ## Cost

@@ -33,7 +33,7 @@ if not question:
 try:
     message = client.messages.create(
         model=MODEL,
-        max_tokens=500,
+        max_tokens=2000,
         messages=[{"role": "user", "content": question}],
     )
 except anthropic.AuthenticationError:
@@ -52,7 +52,11 @@ except anthropic.APIStatusError as e:
     print(f"The API returned an error (status {e.status_code}). Check your billing and credit balance.")
     raise SystemExit(1)
 
-print("\nAnswer:", message.content[0].text)
+answer = "".join(block.text for block in message.content if block.type == "text").strip()
+if answer:
+    print("\nAnswer:", answer)
+else:
+    print("\nNo answer text came back. Try raising max_tokens.")
 if message.stop_reason == "max_tokens":
     print("(The answer was cut off. Raise max_tokens if you need more.)")
 print(f"\nTokens used: {message.usage.input_tokens} in, {message.usage.output_tokens} out")
