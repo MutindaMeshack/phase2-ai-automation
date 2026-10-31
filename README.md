@@ -36,6 +36,7 @@ Create a `.env` file in the project root (see `.env.example`):
 OPENWEATHER_API_KEY=your_key_here
 EXCHANGE_API_KEY=your_key_here
 COUNTRIES_API_KEY=your_key_here
+ANTHROPIC_API_KEY=your_key_here
 ```
 Free keys: openweathermap.org, exchangerate-api.com, restcountries.com
 
@@ -50,4 +51,6 @@ start week1/day4_fetch.html
 python week1/kes-currency-tracker/currency_tracker.py
 python week2/dairy-calculator/dairy_calculator.py
 python week3/sacco-assistant/sacco_assistant.py
+python week3/day12_prompt_practice.py
+python week3/property-extractor/extract_inquiry.py
 ```
