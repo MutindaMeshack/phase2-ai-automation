@@ -23,6 +23,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 2, Days 6 to 9:** Client skills: reading briefs, writing proposals, delivering work, scope and payment terms (writing exercises)
 - **Week 2, Day 10:** Full client cycle on a simulated brief: [Dairy Co-op Payment Calculator](week2/dairy-calculator) and [client messages](week2/day10_client_cycle.md)
 - **Week 3, Day 11:** First AI API call with the Anthropic SDK; [SACCO Member Assistant](week3/sacco-assistant)
+- **Week 3, Day 12:** Prompt engineering (system prompts, few-shot, structured JSON); [Property Inquiry Extractor](week3/property-extractor)
 
 ## Setup
 ```bash
