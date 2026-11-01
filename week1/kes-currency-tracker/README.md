@@ -43,7 +43,7 @@ Rates last updated: Thu, 22 Oct 2026 00:00:01 +0000
 Rates are indicative. Confirm with your bank before invoicing.
 
 Quote another price? (y/n): n
-Goodbye!
+Goodbye.
 ```
 
 ## Error handling
