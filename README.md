@@ -25,6 +25,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 3, Day 11:** First AI API call with the Anthropic SDK; [SACCO Member Assistant](week3/sacco-assistant)
 - **Week 3, Day 12:** Prompt engineering (system prompts, few-shot, structured JSON); [Property Inquiry Extractor](week3/property-extractor)
 - **Week 3, Day 13:** Chatbot with conversation memory, rolling window, streaming and logs; [Kisumu Pharmacy Chatbot](week3/pharmacy-chatbot)
+- **Week 3, Day 14:** Function calling and a tool-using agent; [Tea Harvest Weather Agent](week3/tea-harvest-agent)
 
 ## Setup
 ```bash
@@ -55,4 +56,5 @@ python week3/sacco-assistant/sacco_assistant.py
 python week3/day12_prompt_practice.py
 python week3/property-extractor/extract_inquiry.py
 python week3/pharmacy-chatbot/pharmacy_chatbot.py
+python week3/tea-harvest-agent/harvest_agent.py
 ```

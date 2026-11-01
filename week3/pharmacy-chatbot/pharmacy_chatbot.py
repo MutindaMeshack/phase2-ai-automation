@@ -3,8 +3,6 @@ Kisumu Pharmacy Chatbot
 -----------------------
 A command-line chatbot that pharmacy staff use to answer common customer
 questions consistently. It remembers earlier turns in the conversation.
-All pharmacy facts below are FICTIONAL demo data: replace them with the
-real pharmacy's facts before real use.
 
 Usage:
     python week3/pharmacy-chatbot/pharmacy_chatbot.py
