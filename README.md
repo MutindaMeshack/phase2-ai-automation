@@ -24,6 +24,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 2, Day 10:** Full client cycle on a simulated brief: [Dairy Co-op Payment Calculator](week2/dairy-calculator) and [client messages](week2/day10_client_cycle.md)
 - **Week 3, Day 11:** First AI API call with the Anthropic SDK; [SACCO Member Assistant](week3/sacco-assistant)
 - **Week 3, Day 12:** Prompt engineering (system prompts, few-shot, structured JSON); [Property Inquiry Extractor](week3/property-extractor)
+- **Week 3, Day 13:** Chatbot with conversation memory, rolling window, streaming and logs; [Kisumu Pharmacy Chatbot](week3/pharmacy-chatbot)
 
 ## Setup
 ```bash
@@ -53,4 +54,5 @@ python week2/dairy-calculator/dairy_calculator.py
 python week3/sacco-assistant/sacco_assistant.py
 python week3/day12_prompt_practice.py
 python week3/property-extractor/extract_inquiry.py
+python week3/pharmacy-chatbot/pharmacy_chatbot.py
 ```
