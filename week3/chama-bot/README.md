@@ -1,6 +1,6 @@
 # Chama FAQ Bot
 
-A command-line tool for a chama secretary. She types a member's question, and the bot answers from the chama's own rules (contributions, meeting schedule, fines, loans, welfare). If the answer is not in the rules, it says so and points to the right official.
+A command-line tool for a chama secretary. He types a member's question, and the bot answers from the chama's own rules (contributions, meeting schedule, fines, loans, welfare). If the answer is not in the rules, it says so and points to the right official.
 
 ## What it does
 - Answers from a knowledge base file that the secretary can edit, with no coding
@@ -21,17 +21,12 @@ A command-line tool for a chama secretary. She types a member's question, and th
    ```
 
 ## Usage
-Interactive:
 ```bash
 python week3/chama-bot/chama_bot.py
 ```
-One question:
-```bash
-python week3/chama-bot/chama_bot.py "When is the next meeting?"
-```
 
 ## Changing the rules
-Open `knowledge_base.md`, edit the text, and save it. No code changes are needed. The demo file contains invented data.
+Open `knowledge_base.md`, edit the text, and save it. No code changes are needed.
 
 ## Example interaction
 ```
@@ -56,9 +51,6 @@ To apply, contact the treasurer. The committee decides at the monthly meeting.
 Question: quit
 Goodbye!
 ```
-
-## Cost
-Each question sends the whole knowledge base plus the question, and Claude sends an answer back. The tool prints the token counts. With the Claude Haiku 5.5 prices (USD 0.10 per million input tokens and 0.50 per million output tokens, as listed in Anthropic's docs when this was written), my test runs cost: [FILL IN FROM YOUR OWN TOKEN COUNTS]. A longer knowledge base costs more on every question.
 
 ## Limits
 - It answers only from the knowledge base. It can be wrong, so the secretary should check anything important.
