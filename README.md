@@ -27,11 +27,13 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 3, Day 13:** Chatbot with conversation memory, rolling window, streaming and logs; [Kisumu Pharmacy Chatbot](week3/pharmacy-chatbot)
 - **Week 3, Day 14:** Function calling and a tool-using agent; [Tea Harvest Weather Agent](week3/tea-harvest-agent)
 - **Week 3, Day 15:** Project: [Chama FAQ Bot](week3/chama-bot), a CLI tool that answers chama members' questions from a knowledge base
+- **Week 4, Day 16:** Flask basics (routes, JSON, status codes); [Customer Balance Lookup](week4/hardware-balance), a web tool for a hardware shop
 
 ## Setup
 ```bash
 pip install requests python-dotenv
 pip install requests python-dotenv anthropic
+flask
 ```
 
 Create a `.env` file in the project root (see `.env.example`):
@@ -59,4 +61,6 @@ python week3/property-extractor/extract_inquiry.py
 python week3/pharmacy-chatbot/pharmacy_chatbot.py
 python week3/tea-harvest-agent/harvest_agent.py
 python week3/chama-bot/chama_bot.py
+python week4/day16_flask_practice.py
+python week4/hardware-balance/app.py
 ```

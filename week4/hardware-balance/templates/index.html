@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ shop_name }}: Customer Balances</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 20px; color: #222; }
+    h1 { color: #1F4E79; font-size: 26px; }
+    .sub { color: #555; margin-top: -8px; }
+    label { display: block; margin-top: 16px; font-weight: bold; }
+    input { padding: 10px; font-size: 16px; width: 100%; box-sizing: border-box; margin-top: 6px; }
+    button { margin-top: 12px; background: #2E75B6; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1F4E79; }
+    button:disabled { background: #9db7d1; cursor: not-allowed; }
+    #result { margin-top: 20px; padding: 16px; border-radius: 8px; background: #f7f9fc; border: 1px solid #d0dff0; }
+    #result.error { background: #fdecea; border-color: #f5b5ae; color: #8a1c12; }
+    #result.loading { color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>{{ shop_name }}</h1>
+  <p class="sub">Customer balance lookup</p>
+
+  <form id="searchForm" action="/api/balance" method="get">
+    <label for="nameInput">Customer name</label>
+    <input type="text" id="nameInput" name="name" maxlength="60" placeholder="e.g. Kiprop Rotich" autocomplete="off" required>
+    <button type="submit" id="searchBtn">Search</button>
+  </form>
+
+  <div id="result">Type a customer's full name and press Search.</div>
+
+  <script>
+    const form = document.getElementById("searchForm");
+    const input = document.getElementById("nameInput");
+    const button = document.getElementById("searchBtn");
+    const box = document.getElementById("result");
+
+    function show(text, type) {
+      box.className = type || "";
+      box.textContent = text;   // textContent shows text as plain text, never as HTML
+    }
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const name = input.value.trim();
+      if (!name) {
+        show("Please enter a customer name.", "error");
+        return;
+      }
+
+      show("Searching...", "loading");
+      button.disabled = true;
+
+      try {
+        const response = await fetch("/api/balance?name=" + encodeURIComponent(name));
+        let data = {};
+        try { data = await response.json(); } catch (e) { data = {}; }
+
+        if (!response.ok) {
+          throw new Error(data.error || "Server error (" + response.status + ").");
+        }
+
+        if (data.balance_kes === 0) {
+          show(data.customer + " has no balance owing.", "");
+        } else {
+          show(data.customer + " owes KES " + data.balance_kes.toLocaleString() + ".", "");
+        }
+      } catch (error) {
+        const message = error.name === "TypeError"
+          ? "Could not reach the server. Is it running?"
+          : error.message;
+        show(message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
