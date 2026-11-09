@@ -13,15 +13,27 @@ Both need the header `X-API-Key`.
 
 Errors return JSON with a message: 400 (bad data), 401 (wrong key), 404, 405, and 409 (a record for that shed and date already exists).
 
+## Web page
+1. Start the server and open http://127.0.0.1:5000
+2. Log in with the password from your `.env` file.
+3. Choose a shed and a date, enter the count, and press Submit.
+4. The records and totals appear on the page.
+
+The page talks to the Flask server, and the server talks to the API with the key. The farmer never needs the key.
+![Egg_tracker_page](image-1.png)
+
 ## Setup
 1. Install Python 3.
 2. Install the libraries:
    ```bash
-   pip install flask python-dotenv requests
+   pip install -r week4/egg-tracker/requirements.txt
    ```
 3. Create a `.env` file in the project root with a long random key:
    ```
    EGGS_API_KEY=your_key_here
+   EGGS_ADMIN_PASSWORD=your_value_here
+   FLASK_SECRET_KEY=your_key_here
+   
    ```
 
 ## Run

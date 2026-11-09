@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>CORS demo</title></head>
+<body>
+  <h1>CORS demo</h1>
+  <button id="go">Call the API</button>
+  <p id="out">Press the button.</p>
+  <script>
+    document.getElementById("go").addEventListener("click", async () => {
+      const out = document.getElementById("out");
+      out.textContent = "Loading...";
+      try {
+        const response = await fetch("http://127.0.0.1:5000/api/hello");
+        const data = await response.json();
+        out.textContent = data.message;
+      } catch (error) {
+        out.textContent = "Blocked or failed. Open the Console (F12) to see why.";
+      }
+    });
+  </script>
+</body>
+</html>

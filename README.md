@@ -29,6 +29,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 3, Day 15:** Project: [Chama FAQ Bot](week3/chama-bot), a CLI tool that answers chama members' questions from a knowledge base
 - **Week 4, Day 16:** Flask basics (routes, JSON, status codes); [Customer Balance Lookup](week4/hardware-balance), a web tool for a hardware shop
 - **Week 4, Day 17:** REST API with Flask (GET, POST, PUT, DELETE, API key from .env); [Egg Production Tracker API](week4/egg-tracker)
+- **Week 4, Day 18:** Connecting a browser frontend to a Flask backend (fetch, loading and error states, login session); [Egg Production Tracker](week4/egg-tracker) now has a web page
 
 ## Setup
 ```bash
@@ -45,6 +46,8 @@ COUNTRIES_API_KEY=your_key_here
 ANTHROPIC_API_KEY=your_key_here
 ORDERS_API_KEY=your_key_here
 EGGS_API_KEY=your_key_here
+EGGS_ADMIN_PASSWORD=your_value_here
+FLASK_SECRET_KEY=your_key_here
 ```
 Free keys: openweathermap.org, exchangerate-api.com, restcountries.com
 

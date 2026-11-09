@@ -1,43 +1,65 @@
 """
-Egg Production Tracker API
---------------------------
-A poultry farmer logs the eggs collected from each shed every day and reads the
-totals at the end of the week.
+Egg Production Tracker (web page + API)
+---------------------------------------
+A poultry farmer's manager logs in, records the eggs collected from each shed
+each day, and sees all records and totals on one page, without reloading it.
 
-Endpoints (both need an X-API-Key header):
-    POST /api/eggs    log a day's count:  {"shed": "Shed A", "date": "2026-11-02", "count": 420}
-    GET  /api/eggs    all records with running totals.
-                      Optional filters: ?from=2026-11-02&to=2026-11-08
+Pages:
+    /login       password form
+    /            the tracker page (needs login)
+API (needs a login session OR an X-API-Key header):
+    POST /api/eggs   {"shed": "Shed A", "date": "2026-11-02", "count": 420}
+    GET  /api/eggs   all records with running totals
+                     Optional filters: ?from=2026-11-02&to=2026-11-08
 
 Run:
     python week4/egg-tracker/app.py
-Stop the server with Ctrl+C.
+Then open http://127.0.0.1:5000. Stop the server with Ctrl+C.
 
-Requires EGGS_API_KEY in the .env file in the project root.
+Requires in the .env file in the project root:
+    EGGS_API_KEY, EGGS_ADMIN_PASSWORD, FLASK_SECRET_KEY
 Records are kept in memory and are lost when the server stops.
-The shed names below are examples: replace them with the farmer's real shed names.
+The shed names below are examples: replace them with the farmer's real names.
 """
 
 import hmac
 import os
 import re
+import time
 from datetime import date
 from functools import wraps
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 load_dotenv()
 
 API_KEY = os.getenv("EGGS_API_KEY")
-if not API_KEY:
-    raise SystemExit("Add EGGS_API_KEY to your .env file (see the roadmap for how to make one).")
+ADMIN_PASSWORD = os.getenv("EGGS_ADMIN_PASSWORD")
+SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
+
+missing = [
+    name
+    for name, value in (
+        ("EGGS_API_KEY", API_KEY),
+        ("EGGS_ADMIN_PASSWORD", ADMIN_PASSWORD),
+        ("FLASK_SECRET_KEY", SECRET_KEY),
+    )
+    if not value
+]
+if missing:
+    raise SystemExit("Add these to your .env file: " + ", ".join(missing))
 
 SHEDS = ["Shed A", "Shed B", "Shed C"]
 MAX_COUNT = 20000
 
 app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 10_000  # reject very large request bodies
+app.secret_key = SECRET_KEY
+app.config.update(
+    MAX_CONTENT_LENGTH=10_000,  # reject very large request bodies
+    SESSION_COOKIE_HTTPONLY=True,  # page JavaScript cannot read the cookie
+    SESSION_COOKIE_SAMESITE="Lax",  # the cookie is not sent on cross-site POSTs
+)
 
 records = []
 next_id = 1
@@ -54,12 +76,19 @@ def fail(message, status):
     return jsonify({"error": message}), status
 
 
-def require_api_key(view):
-    @wraps(view)
+def has_access():
+    """True for a logged-in browser session, or a request with the right API key."""
+    if session.get("admin"):
+        return True
+    supplied = request.headers.get("X-API-Key", "")
+    return hmac.compare_digest(supplied.encode("utf-8"), API_KEY.encode("utf-8"))
+
+
+def require_access(view):
+    @wraps(view)  # keeps each route's function name unique, which Flask needs
     def wrapper(*args, **kwargs):
-        supplied = request.headers.get("X-API-Key", "")
-        if not hmac.compare_digest(supplied.encode("utf-8"), API_KEY.encode("utf-8")):
-            return fail("Invalid or missing API key", 401)
+        if not has_access():
+            return fail("Not logged in, or invalid API key", 401)
         return view(*args, **kwargs)
 
     return wrapper
@@ -75,6 +104,12 @@ def parse_date(value):
         return None
 
 
+@app.after_request
+def no_store(response):
+    response.headers["Cache-Control"] = "no-store"  # do not keep records in the browser cache
+    return response
+
+
 @app.errorhandler(404)
 @app.errorhandler(405)
 @app.errorhandler(413)
@@ -82,8 +117,39 @@ def http_error(error):
     return jsonify({"error": error.description}), error.code
 
 
+# ---------- Pages ----------
+
+@app.route("/")
+def home():
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+    return render_template("index.html", sheds=SHEDS)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        supplied = request.form.get("password", "")
+        if hmac.compare_digest(supplied.encode("utf-8"), ADMIN_PASSWORD.encode("utf-8")):
+            session.clear()
+            session["admin"] = True
+            return redirect(url_for("home"))
+        time.sleep(1)  # slows down password guessing
+        error = "Wrong password."
+    return render_template("login.html", error=error)
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ---------- API ----------
+
 @app.route("/api/eggs", methods=["POST"])
-@require_api_key
+@require_access
 def log_eggs():
     global next_id
     data = request.get_json(silent=True)
@@ -114,7 +180,7 @@ def log_eggs():
 
 
 @app.route("/api/eggs", methods=["GET"])
-@require_api_key
+@require_access
 def list_eggs():
     start = end = None
     if "from" in request.args:
@@ -152,5 +218,5 @@ def list_eggs():
 
 
 if __name__ == "__main__":
-    # Bound to this computer only. Debug mode is off because this API holds a key and data.
+    # Bound to this computer only. Debug mode is off because this app holds a password and data.
     app.run(host="127.0.0.1", port=5000, debug=False)

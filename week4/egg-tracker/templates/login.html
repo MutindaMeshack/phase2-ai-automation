@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Egg Production Tracker: Log in</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 380px; margin: 60px auto; padding: 0 20px; color: #222; }
+    h1 { color: #1F4E79; font-size: 24px; }
+    label { display: block; margin-top: 16px; font-weight: bold; }
+    input { padding: 10px; font-size: 16px; width: 100%; box-sizing: border-box; margin-top: 6px; }
+    button { margin-top: 16px; background: #2E75B6; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1F4E79; }
+    .error { margin-top: 16px; padding: 12px; border-radius: 8px; background: #fdecea; border: 1px solid #f5b5ae; color: #8a1c12; }
+  </style>
+</head>
+<body>
+  <h1>Egg Production Tracker</h1>
+  <form method="post" action="{{ url_for('login') }}">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required autofocus>
+    <button type="submit">Log in</button>
+  </form>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+</body>
+</html>

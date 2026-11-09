@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Egg Production Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 720px; margin: 30px auto; padding: 0 16px; color: #222; }
+    h1 { color: #1F4E79; font-size: 26px; margin: 0; }
+    h2 { color: #1F4E79; font-size: 20px; margin-top: 32px; }
+    .top { display: flex; justify-content: space-between; align-items: center; }
+    label { display: block; margin-top: 14px; font-weight: bold; }
+    select, input { padding: 10px; font-size: 16px; width: 100%; box-sizing: border-box; margin-top: 6px; }
+    button { background: #2E75B6; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1F4E79; }
+    button:disabled { background: #9db7d1; cursor: not-allowed; }
+    #saveBtn { margin-top: 16px; }
+    .link { background: none; color: #1F4E79; text-decoration: underline; padding: 0; font-size: 14px; }
+    #message { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
+    #message.ok { display: block; background: #e8f5e9; border: 1px solid #a5d6a7; }
+    #message.error { display: block; background: #fdecea; border: 1px solid #f5b5ae; color: #8a1c12; }
+    #summary { margin: 8px 0; font-weight: bold; }
+    .tablewrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d0dff0; padding: 8px 10px; text-align: left; }
+    th { background: #f0f5fb; }
+    td.num, th.num { text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>Egg Production Tracker</h1>
+    <form method="post" action="{{ url_for('logout') }}">
+      <button class="link" type="submit">Log out</button>
+    </form>
+  </div>
+
+  <form id="eggForm">
+    <label for="shed">Shed</label>
+    <select id="shed" required>
+      <option value="">Choose a shed</option>
+      {% for shed in sheds %}<option value="{{ shed }}">{{ shed }}</option>{% endfor %}
+    </select>
+
+    <label for="day">Date</label>
+    <input type="date" id="day" required>
+
+    <label for="count">Eggs collected</label>
+    <input type="number" id="count" min="0" max="20000" step="1" inputmode="numeric" required>
+
+    <button type="submit" id="saveBtn">Submit</button>
+  </form>
+
+  <div id="message" role="status"></div>
+
+  <h2>Records</h2>
+  <div id="summary">Loading records...</div>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Shed</th><th class="num">Eggs</th><th class="num">Running total</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById("eggForm");
+    const shedInput = document.getElementById("shed");
+    const dayInput = document.getElementById("day");
+    const countInput = document.getElementById("count");
+    const saveBtn = document.getElementById("saveBtn");
+    const message = document.getElementById("message");
+    const summary = document.getElementById("summary");
+    const rows = document.getElementById("rows");
+
+    // Today's date in the computer's own time zone (toISOString alone would use UTC)
+    function localToday() {
+      const d = new Date();
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+    dayInput.value = localToday();
+    dayInput.max = localToday();
+
+    function setMessage(text, type) {
+      message.className = type || "";
+      message.textContent = text;   // textContent shows text as plain text, never as HTML
+    }
+
+    function friendly(error) {
+      return error.name === "TypeError"
+        ? "Could not reach the server. Is it running?"
+        : error.message;
+    }
+
+    // One helper for every call: handles login expiry and server errors the same way
+    async function api(path, options) {
+      const response = await fetch(path, options);
+      if (response.status === 401) {
+        window.location.href = "/login";
+        throw new Error("Please log in again.");
+      }
+      let data = {};
+      try { data = await response.json(); } catch (e) { data = {}; }
+      if (!response.ok) {
+        throw new Error(data.error || "Server error (" + response.status + ").");
+      }
+      return data;
+    }
+
+    function addCell(tr, text, isNumber) {
+      const td = document.createElement("td");
+      if (isNumber) td.className = "num";
+      td.textContent = text;
+      tr.appendChild(td);
+    }
+
+    function renderTable(data) {
+      rows.textContent = "";
+      if (data.records.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = "No records yet.";
+        tr.appendChild(td);
+        rows.appendChild(tr);
+      }
+      for (const r of data.records) {
+        const tr = document.createElement("tr");
+        addCell(tr, r.date, false);
+        addCell(tr, r.shed, false);
+        addCell(tr, r.count.toLocaleString(), true);
+        addCell(tr, r.running_total.toLocaleString(), true);
+        rows.appendChild(tr);
+      }
+      const perShed = Object.entries(data.totals_by_shed)
+        .map(([shed, total]) => shed + ": " + total.toLocaleString());
+      summary.textContent = "Total eggs: " + data.total_eggs.toLocaleString()
+        + (perShed.length ? "  (" + perShed.join(", ") + ")" : "");
+    }
+
+    async function loadRecords() {
+      try {
+        renderTable(await api("/api/eggs"));
+      } catch (error) {
+        summary.textContent = "";
+        setMessage(friendly(error), "error");
+      }
+    }
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const countText = countInput.value.trim();
+      if (!/^\d+$/.test(countText)) {
+        setMessage("Enter the egg count as a whole number, for example 420.", "error");
+        return;
+      }
+
+      const payload = {
+        shed: shedInput.value,
+        date: dayInput.value,
+        count: parseInt(countText, 10)
+      };
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+      setMessage("", "");
+
+      try {
+        const record = await api("/api/eggs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        setMessage("Saved: " + record.shed + ", " + record.date + ", "
+          + record.count.toLocaleString() + " eggs.", "ok");
+        countInput.value = "";
+        await loadRecords();   // refresh the table, with no page reload
+      } catch (error) {
+        setMessage(friendly(error), "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Submit";
+      }
+    });
+
+    loadRecords();
+  </script>
+</body>
+</html>
