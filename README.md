@@ -28,6 +28,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 3, Day 14:** Function calling and a tool-using agent; [Tea Harvest Weather Agent](week3/tea-harvest-agent)
 - **Week 3, Day 15:** Project: [Chama FAQ Bot](week3/chama-bot), a CLI tool that answers chama members' questions from a knowledge base
 - **Week 4, Day 16:** Flask basics (routes, JSON, status codes); [Customer Balance Lookup](week4/hardware-balance), a web tool for a hardware shop
+- **Week 4, Day 17:** REST API with Flask (GET, POST, PUT, DELETE, API key from .env); [Egg Production Tracker API](week4/egg-tracker)
 
 ## Setup
 ```bash
@@ -42,6 +43,8 @@ OPENWEATHER_API_KEY=your_key_here
 EXCHANGE_API_KEY=your_key_here
 COUNTRIES_API_KEY=your_key_here
 ANTHROPIC_API_KEY=your_key_here
+ORDERS_API_KEY=your_key_here
+EGGS_API_KEY=your_key_here
 ```
 Free keys: openweathermap.org, exchangerate-api.com, restcountries.com
 
@@ -63,4 +66,6 @@ python week3/tea-harvest-agent/harvest_agent.py
 python week3/chama-bot/chama_bot.py
 python week4/day16_flask_practice.py
 python week4/hardware-balance/app.py
+python week4/day17_orders_api.py
+python week4/egg-tracker/app.py
 ```
