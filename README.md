@@ -2,6 +2,9 @@
 
 My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 
+## Live Demo
+**[Egg Production Tracker](https://egg-tracker-guss.onrender.com/)**: a Flask app deployed on Render with a REST API and a password-protected web page. The free host sleeps when idle, so the first load can take about a minute. Login details are available on request.
+
 ## Projects
 
 ### Travel Weather Tool (Week 1, Day 3)
@@ -30,6 +33,7 @@ My work from the AI Masterclass 2 program (Automate and Monetize AI Skills).
 - **Week 4, Day 16:** Flask basics (routes, JSON, status codes); [Customer Balance Lookup](week4/hardware-balance), a web tool for a hardware shop
 - **Week 4, Day 17:** REST API with Flask (GET, POST, PUT, DELETE, API key from .env); [Egg Production Tracker API](week4/egg-tracker)
 - **Week 4, Day 18:** Connecting a browser frontend to a Flask backend (fetch, loading and error states, login session); [Egg Production Tracker](week4/egg-tracker) now has a web page
+- **Week 4, Day 19:** Deploying to Render with gunicorn and environment variables; the [Egg Production Tracker](https://egg-tracker-guss.onrender.com/) is live
 
 ## Setup
 ```bash
@@ -72,3 +76,6 @@ python week4/hardware-balance/app.py
 python week4/day17_orders_api.py
 python week4/egg-tracker/app.py
 ```
+
+## Deployment
+The egg tracker is deployed on Render from this repository (Root Directory `week4/egg-tracker`, start command `gunicorn app:app --workers 1 --bind 0.0.0.0:$PORT`). Its secrets are set in Render's Environment tab and are never in the code.

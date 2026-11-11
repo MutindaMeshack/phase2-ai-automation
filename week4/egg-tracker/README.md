@@ -2,6 +2,11 @@
 
 A small REST API for a poultry farmer with three sheds. He logs each shed's daily egg count and reads the totals at the end of the week, instead of adding up WhatsApp messages by hand.
 
+## Live Demo
+https://egg-tracker-guss.onrender.com/
+
+The free host puts the app to sleep when idle, so the first load can take about a minute. Records are kept in memory and are cleared when the app restarts or sleeps. Login details are not published.
+
 ## Endpoints
 Both need the header `X-API-Key`.
 
@@ -45,6 +50,20 @@ In a second terminal, run the checks:
 python week4/egg-tracker/test_api.py
 ```
 
+## Deployment
+Deployed on Render (free tier) from this repository.
+
+| Setting | Value |
+|---|---|
+| Root Directory | `week4/egg-tracker` |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `gunicorn app:app --workers 1 --bind 0.0.0.0:$PORT` |
+
+- `EGGS_API_KEY`, `EGGS_ADMIN_PASSWORD` and `FLASK_SECRET_KEY` are set in Render's Environment tab, with different values from my local `.env`. They are never in the code or on GitHub.
+- One worker is used on purpose, because records live in memory and several workers would each keep a separate list.
+- Every push to `main` redeploys the app.
+
+
 ## Example response
 ```
 --- Valid records ---
@@ -60,13 +79,19 @@ python week4/egg-tracker/test_api.py
        {"count":0,"date":"2026-11-09","id":5,"shed":"Shed C"}
 ```
 
+## Security
+- The API key never reaches the browser. It stays on the server, and the browser only holds a login session.
+- The session cookie is `HttpOnly` and `SameSite=Lax`.
+- CORS is deliberately not enabled.
+- The live demo is served over HTTPS by Render. Local runs use plain `http://127.0.0.1`.
+
 ## Limits
-- Records are kept in memory and are lost when the server stops. A real deployment needs a database.
+- Records are kept in memory and are lost when the app restarts or the free host puts it to sleep. A real deployment needs a database.
+- One shared API key and one shared password, with no individual logins.
 - The shed names in `app.py` are examples. Replace them with the farmer's real names.
-- A farmer cannot use an API directly. He needs a simple page or chat front end on top.
+- The wrong-password delay is not real protection against guessing. A real version needs proper rate limiting.
 - There is no way yet to correct or delete a wrong record.
-- One shared API key, with no individual logins. It travels unencrypted unless the server uses HTTPS.
-- The built-in Flask server is for development only.
+- The free host is slow to wake after idle time.
 
 ## Price
 - **Build and deploy:** KES 30,000 one-off. Includes the API, saving records permanently in a database (not just in memory), a simple weekly-summary page, deployment, and a one-hour handover.
