@@ -32,9 +32,7 @@ python week4/complaint-reply/app.py
 Open http://127.0.0.1:5000
 
 ## Example
-```
-![Example output](image.png)
-```
+![Complaint Reply Drafter showing a draft reply](complaint-reply-example.png)
 
 ## Protecting the demo
 - The API key lives only in Render's environment settings and never reaches the browser.
