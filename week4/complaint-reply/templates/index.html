@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Complaint Reply Drafter</title>
+  <style>
+    [hidden] { display: none !important; }
+    body { font-family: Arial, sans-serif; max-width: 640px; margin: 30px auto; padding: 0 16px; color: #222; }
+    h1 { color: #1F4E79; font-size: 26px; margin-bottom: 4px; }
+    .sub { color: #555; margin-top: 0; }
+    label { display: block; margin-top: 20px; font-weight: bold; }
+    textarea { width: 100%; box-sizing: border-box; min-height: 150px; padding: 10px; font-size: 16px; margin-top: 6px; font-family: inherit; }
+    .row { display: flex; justify-content: space-between; margin-top: 6px; color: #666; font-size: 14px; }
+    button { background: #2E75B6; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1F4E79; }
+    button:disabled { background: #9db7d1; cursor: not-allowed; }
+    #generateBtn { margin-top: 14px; }
+    #notice { margin-top: 16px; padding: 12px; border-radius: 8px; }
+    #notice.error { background: #fdecea; border: 1px solid #f5b5ae; color: #8a1c12; }
+    #notice.loading { background: #f7f9fc; border: 1px solid #d0dff0; color: #555; font-style: italic; }
+    #output { margin-top: 20px; }
+    #replyText { white-space: pre-wrap; background: #f7f9fc; border: 1px solid #d0dff0; border-radius: 8px; padding: 16px; line-height: 1.5; }
+    #copyBtn { margin-top: 10px; }
+    .small { color: #666; font-size: 14px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Complaint Reply Drafter</h1>
+  <p class="sub">Paste a customer complaint and get a polite reply you can send.</p>
+
+  <label for="complaint">Customer complaint</label>
+  <textarea id="complaint" maxlength="1000" placeholder="Paste the complaint here"></textarea>
+  <div class="row">
+    <span>Please do not include phone numbers or other personal details.</span>
+    <span id="counter">0 / 1000</span>
+  </div>
+
+  <button id="generateBtn" type="button">Generate Reply</button>
+
+  <div id="notice" hidden></div>
+
+  <div id="output" hidden>
+    <label>Draft reply</label>
+    <div id="replyText"></div>
+    <button id="copyBtn" type="button">Copy reply</button>
+    <p class="small">This is an AI draft. Read it, replace the [brackets], and change anything that is not true for your business before you send it.</p>
+  </div>
+
+  <script>
+    const MAX_LENGTH = 1000;
+    const box = document.getElementById("complaint");
+    const counter = document.getElementById("counter");
+    const button = document.getElementById("generateBtn");
+    const notice = document.getElementById("notice");
+    const output = document.getElementById("output");
+    const replyText = document.getElementById("replyText");
+    const copyBtn = document.getElementById("copyBtn");
+
+    function updateCounter() {
+      counter.textContent = box.value.length + " / " + MAX_LENGTH;
+    }
+    box.addEventListener("input", updateCounter);
+    updateCounter();
+
+    function showNotice(text, type) {
+      notice.hidden = !text;
+      notice.className = type || "";
+      notice.textContent = text;   // textContent shows text as plain text, never as HTML
+    }
+
+    async function generate() {
+      const complaint = box.value.trim();
+      output.hidden = true;
+
+      if (!complaint) {
+        showNotice("Please paste a customer complaint first.", "error");
+        return;
+      }
+      if (complaint.length > MAX_LENGTH) {
+        showNotice("That is too long. Please keep it under " + MAX_LENGTH + " characters.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Generating...";
+      showNotice("Writing a reply... the first request can take up to a minute if the demo has been idle.", "loading");
+
+      const controller = new AbortController();
+      const timer = setTimeout(function () { controller.abort(); }, 75000);
+
+      try {
+        const response = await fetch("/api/reply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ complaint: complaint }),
+          signal: controller.signal
+        });
+        let data = {};
+        try { data = await response.json(); } catch (e) { data = {}; }
+        if (!response.ok) {
+          throw new Error(data.error || "Server error (" + response.status + "). Please try again.");
+        }
+        showNotice("", "");
+        replyText.textContent = data.reply;
+        output.hidden = false;
+      } catch (error) {
+        let message = error.message;
+        if (error.name === "AbortError") {
+          message = "This is taking too long. The demo may be waking up. Please try again in a minute.";
+        } else if (error.name === "TypeError") {
+          message = "Could not reach the server. Check your internet and try again.";
+        }
+        showNotice(message, "error");
+      } finally {
+        clearTimeout(timer);
+        button.disabled = false;
+        button.textContent = "Generate Reply";
+      }
+    }
+
+    button.addEventListener("click", generate);
+
+    copyBtn.addEventListener("click", async function () {
+      try {
+        await navigator.clipboard.writeText(replyText.textContent);
+        copyBtn.textContent = "Copied";
+      } catch (e) {
+        copyBtn.textContent = "Select the text and copy it";
+      }
+      setTimeout(function () { copyBtn.textContent = "Copy reply"; }, 2000);
+    });
+  </script>
+</body>
+</html>
